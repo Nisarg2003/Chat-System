@@ -1,17 +1,18 @@
-// src/Chat.js
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
+import './Chat.css'
 
 function Chat({ token, username, selectedUser }) {
   const [message, setMessage] = useState('');
   const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
 
-  useEffect(() => {
-      socketRef.current = io('http://localhost:8080');
+  const socket = useMemo(() => io("http://localhost:8080/"), []);
 
-    socketRef.current.on('message', (data) => {
+  useEffect(() => {
+
+    socket.on('message', (data) => {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
@@ -28,9 +29,9 @@ function Chat({ token, username, selectedUser }) {
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socket.disconnect();
     };
-  }, );
+  },);
 
   const handleSendMessage = () => {
     if (selectedUser && message.trim() !== '') {
@@ -46,7 +47,7 @@ function Chat({ token, username, selectedUser }) {
         },
       })
       .then(() => {
-        socketRef.current.emit('message', messageData);
+        socket.emit('message', messageData);
         setMessage('');
       })
       .catch((error) => {
@@ -56,24 +57,29 @@ function Chat({ token, username, selectedUser }) {
   };
 
   return (
-    <div>
+    <div className="chat-container">
+    <header>
       <h2>Chat with {selectedUser}</h2>
-      <div style={{ border: '1px solid #ccc', padding: '10px', height: '300px', overflowY: 'auto' }}>
-        {messages.map((msg, index) => (
-          <div key={index}>{`${msg.sender}: ${msg.message}`}</div>
-        ))}
-      </div>
-      <div>
-        <input
-          type="text"
-          value={message}
-          onChange={(e) => setMessage(e.target.value)}
-        />
-        <button onClick={handleSendMessage} disabled={!selectedUser || !message}>
-          Send Message
-        </button>
-      </div>
+    </header>
+    <div className="messages-container">
+      {messages.map((msg, index) => (
+        <div key={index} className={msg.sender === username ? 'sent-message' : 'received-message'}>
+          <span className="message-sender">{msg.sender}</span>: {msg.message}
+        </div>
+      ))}
     </div>
+    <div className="input-container">
+      <input
+        type="text"
+        value={message}
+        onChange={(e) => setMessage(e.target.value)}
+        placeholder="Type your message..."
+      />
+      <button onClick={handleSendMessage} disabled={!selectedUser || !message}>
+        Send
+      </button>
+    </div>
+  </div>
   );
 }
 

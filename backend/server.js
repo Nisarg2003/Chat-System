@@ -13,21 +13,20 @@ import cors from 'cors'
 import { sendMessage } from './Controller/ChatController.js';
 
 const app = express();
-app.use(cors())
 connectDb()
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-      origin: "http://localhost:3000",
+        origin: "http://localhost:3000",
     },
     
-  });
+});
 
 
+app.use(cors())
 const port = 8080;
 
 app.use(express.json());
-// app.use(cors(corsOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -51,6 +50,11 @@ app.get('/', (req, res) => {
 app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    const existingUser = userModel.findOne({username})
+    if(existingUser){
+        return res.status(401).json({ message: 'Username Already Taken' });
+    }
 
     await userModel.create({ username, password: hashedPassword });
 
@@ -94,7 +98,7 @@ app.get('/api/messages/:sender/:receiver', async (req, res) => {
                 { sender, receiver },
                 { sender: receiver, receiver: sender },
             ],
-        }).sort({ createdAt: 1 }); // Sort messages by createdAt in ascending order
+        }).sort({ createdAt: 1 }); 
         res.json(messages);
     } catch (error) {
         console.error('Error fetching messages:', error);
@@ -107,7 +111,6 @@ app.post('/api/messages', passport.authenticate('jwt', { session: false }),sendM
 io.on("connection", (socket) => {
     console.log("A user connected");
   
-    // Example: Handle socket events
     socket.on("disconnect", () => {
       console.log("User disconnected");
     });
@@ -115,7 +118,7 @@ io.on("connection", (socket) => {
 
 
 
-app.listen(port, () => {
+server.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
 });
 

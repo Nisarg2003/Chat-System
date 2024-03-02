@@ -1,8 +1,8 @@
 // src/App.js
 import React, { useState, useEffect, useRef } from 'react';
-import io from 'socket.io-client';
 import axios from 'axios';
 import Chat from './chat';
+import './App.css'
 
 
 function App() {
@@ -11,11 +11,7 @@ function App() {
   const [token, setToken] = useState('');
   const [otherUsers, setOtherUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState('');
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
-  const socketRef = useRef(null);
-  
-  
+   
   
   useEffect(() => {
    
@@ -46,56 +42,61 @@ function App() {
   };
 
   const handleRegister = async () => {
-    try {
-      await axios.post('http://localhost:8080/api/register', {
-        username,
-        password,
-      });
-      
-      handleLogin();
-    } catch (error) {
-      console.error('Registration error:', error.response ? error.response.data : error.message);
+    if (username.trim() !== '' && password.trim() !== '') {
+      try {
+        await axios.post('http://localhost:8080/api/register', {
+          username,
+          password,
+        });
+        
+        handleLogin(); // Automatically login after successful registration
+      } catch (error) {
+        console.error('Registration error:', error.response ? error.response.data : error.message);
+      }
+    } else {
+      console.error('Please enter both username and password for registration.');
     }
   };
   
-
-
-
-
   return (
-    <div>
-      <h1>Chat App</h1>
-      {token ? (
-         <>
-         <h2>Welcome, {username}!</h2>
-         <div>
-           <h3>Other Users</h3>
-           <ul>
-             {otherUsers.map((user) => (
-               <li key={user} onClick={() => setSelectedUser(user)}>
-                 {user}
-               </li>
-             ))}
-           </ul>
-         </div>
-         {selectedUser && (
-           <Chat token={token} username={username} selectedUser={selectedUser} />
-         )}
-       </>
+    <div className="app-container">
+  <header>
+    <h1>Chat App</h1>
+  </header>
+  <main>
+    {token ? (
+      <div className="chat-container">
+        <section className="user-list">
+          <h3>Other Users</h3>
+          <ul>
+            {otherUsers.map((user) => (
+              <li key={user} onClick={() => setSelectedUser(user)}>
+                {user}
+              </li>
+            ))}
+          </ul>
+        </section>
+        {selectedUser && (
+          <section className="chat-section">
+            <Chat token={token} username={username} selectedUser={selectedUser} />
+          </section>
+        )}
+      </div>
       ) : (
-        <>
+        <section className="auth-section">
           <h2>Login or Register</h2>
           <label>Username:</label>
-          <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <input type="text" value={username} required onChange={(e) => setUsername(e.target.value)} />
           <br />
           <label>Password:</label>
-          <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
+          <input type="password" value={password} required onChange={(e) => setPassword(e.target.value)} />
           <br />
           <button onClick={handleLogin}>Login</button>
           <button onClick={handleRegister}>Register</button>
-        </>
+        </section>
       )}
-    </div>
+    </main>
+  </div>
   );
 }
 
