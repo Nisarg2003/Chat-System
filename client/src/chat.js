@@ -57,7 +57,7 @@ function Chat({ token, username, selectedUser }) {
   };
 
   return (
-    <div className="chat-container">
+    <div className="chat-container-2">
     <header>
       <h2>Chat with {selectedUser}</h2>
     </header>
