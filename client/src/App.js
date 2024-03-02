@@ -16,7 +16,7 @@ function App() {
   useEffect(() => {
    
     if (token) {
-      axios.get('http://localhost:8080/api/other-users', {
+      axios.get('https://chat-system-vb2d.onrender.com/api/other-users', {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -29,7 +29,7 @@ function App() {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:8080/api/login', {
+      const response = await axios.post('https://chat-system-vb2d.onrender.com/api/login', {
         username,
         password,
       });
@@ -44,7 +44,7 @@ function App() {
   const handleRegister = async () => {
     if (username.trim() !== '' && password.trim() !== '') {
       try {
-        await axios.post('http://localhost:8080/api/register', {
+        await axios.post('https://chat-system-vb2d.onrender.com/api/register', {
           username,
           password,
         });

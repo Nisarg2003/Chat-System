@@ -8,7 +8,7 @@ function Chat({ token, username, selectedUser }) {
   const [messages, setMessages] = useState([]);
   const socketRef = useRef(null);
 
-  const socket = useMemo(() => io("http://localhost:8080/"), []);
+  const socket = useMemo(() => io("https://chat-system-vb2d.onrender.com/"), []);
 
   useEffect(() => {
 
@@ -16,7 +16,7 @@ function Chat({ token, username, selectedUser }) {
       setMessages((prevMessages) => [...prevMessages, data]);
     });
 
-    axios.get(`http://localhost:8080/api/messages/${username}/${selectedUser}`, {
+    axios.get(`https://chat-system-vb2d.onrender.com/api/messages/${username}/${selectedUser}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -41,7 +41,7 @@ function Chat({ token, username, selectedUser }) {
         message,
       };
 
-      axios.post('http://localhost:8080/api/messages', messageData, {
+      axios.post('https://chat-system-vb2d.onrender.com/api/messages', messageData, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
