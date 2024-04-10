@@ -51,7 +51,7 @@ app.post('/api/register', async (req, res) => {
     const { username, password } = req.body;
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const existingUser = userModel.findOne({username})
+    const existingUser = await userModel.findOne({username})
     if(existingUser){
         return res.status(401).json({ message: 'Username Already Taken' });
     }
